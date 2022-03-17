@@ -1,3 +1,9 @@
+/**
+ * Blackbox testing for App component.
+ * 
+ * Blackbox tests:
+ */
+
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import App from './App';
