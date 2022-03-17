@@ -39,7 +39,12 @@ class App extends React.Component {
    * Update list of likedForms with what is in the server.
    */
   async hydrateLikedForms() {
-    const result = await fetchLikedFormSubmissions();
+    let result;
+    try {
+      result = await fetchLikedFormSubmissions();
+    } catch(error) {
+      result = await this.retryUntilSucceeded(fetchLikedFormSubmissions)
+    }
     this.setState({likedFormSubmissions: result.formSubmissions});
   }
 
@@ -62,23 +67,38 @@ class App extends React.Component {
     this.setState({ likedFormSubmissions: [...this.state.likedFormSubmissions, likedForm] });
   }
 
-  async likeFormSubmission ()  {
+  async likeFormSubmission()  {
+    console.log('liked form');
+    const { lastSubmittedForm } = this.state;
+    const likedForm = {...lastSubmittedForm, data: { ...lastSubmittedForm.data, liked: true }};
+
+    this.addLikedFormLocally(likedForm);
+
     try {
-      console.log('liked form');
-      const { lastSubmittedForm } = this.state;
-      const likedForm = {...lastSubmittedForm, data: { ...lastSubmittedForm.data, liked: true }};
-
-      this.addLikedFormLocally(likedForm);
-      this.closeSnackbar();
-
       const result = await saveLikedFormSubmission(likedForm);
       console.log('saved', 'result: ', result);
 
       this.hydrateLikedForms();
     } catch(error) {
       console.log('likeFormSubmission error', error);
-      this.closeSnackbar();
+      this.retryUntilSucceeded(saveLikedFormSubmission, [likedForm]);
     }
+
+    this.closeSnackbar();
+  }
+
+  async retryUntilSucceeded(asyncRequest, args = []) {
+    console.log('type async', typeof(asyncRequest));
+    console.log('retrying', asyncRequest);
+    let result;
+    try {
+      result = await asyncRequest(...args);
+      console.log('retry succeeded', asyncRequest);
+    } catch(error) {
+      console.log('error retry', error);
+      result = await this.retryUntilSucceeded(asyncRequest, args);
+    }
+    return result;
   }
 
   tearDownSnackbarTimer() {
@@ -88,7 +108,9 @@ class App extends React.Component {
   }
 
   closeSnackbar() {
-    this.setState({bShowSnackbar: false});
+    if (this.state.bShowSnackbar) {
+      this.setState({bShowSnackbar: false});
+    }
   }
 
   openSnackbarFor5Seconds() {
