@@ -2,6 +2,8 @@ import React from 'react';
 import Container from '@mui/material/Container';
 import Snackbar from '@mui/material/Snackbar';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 import Header from './Header';
 import Content from './Content';
@@ -11,18 +13,28 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      likedFormSubmissions: [],
+      likedFormSubmissions: this.getPersistedLikedForms(),
       bShowSnackbar: false,
       lastSubmittedForm: null
     }
   }
   
   likeSubmissionAction = (
-    <Button onClick={() => {
-      this.likeFormSubmission();
-    }}>
-      Like
-    </Button>
+    <React.Fragment>
+      <Button onClick={() => {
+        this.likeFormSubmission();
+      }}>
+        Like
+      </Button>
+        <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={(event, reason) => this.handleCloseSnackbar(event, reason)}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
   )
 
   async componentDidMount() {
@@ -32,6 +44,7 @@ class App extends React.Component {
   }
 
   componentWillUnmount() {
+    this.persistLikedForms();
     this.tearDownSnackbarTimer();
   }
 
@@ -136,6 +149,29 @@ class App extends React.Component {
       message = `${firstName} ${lastName} ${email}`;
     }
     return message;
+  }
+
+  /**
+   * Save liked forms to local storage.
+   */
+  persistLikedForms() {
+    window.localStorage.setItem('likedFormSubmissions', JSON.stringify(this.state.likedFormSubmissions));
+  }
+
+  /**
+   * Retrieve liked forms saved to local storage.
+   * @returns An array of liked form submissions. Empty if they were never persisted.
+   */
+  getPersistedLikedForms() {
+    return JSON.parse(localStorage.getItem('likedFormSubmissions')) || []
+  }
+
+  handleCloseSnackbar(event, reason) {
+    if (reason == 'clickaway') {
+      return;
+    }
+
+    this.closeSnackbar();
   }
 
   render() {
