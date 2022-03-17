@@ -43,9 +43,12 @@ class App extends React.Component {
     try {
       result = await fetchLikedFormSubmissions();
     } catch(error) {
-      result = await this.retryUntilSucceeded(fetchLikedFormSubmissions)
+      // Retry indefinite amount of times until we get the liked forms.
+      result = await this.retryUntilSucceeded(fetchLikedFormSubmissions, [], -1);
     }
-    this.setState({likedFormSubmissions: result.formSubmissions});
+    if (result) {
+      this.setState({likedFormSubmissions: result.formSubmissions});
+    }
   }
 
   /**
@@ -87,16 +90,23 @@ class App extends React.Component {
     this.closeSnackbar();
   }
 
-  async retryUntilSucceeded(asyncRequest, args = []) {
-    console.log('type async', typeof(asyncRequest));
-    console.log('retrying', asyncRequest);
+  /**
+   * Recursively retry async calls until they are successful.
+   * @param {Function} asyncRequest The async method (that returns a Promise) to retry.
+   * @param {Any[]} args An array of arguments to pass of any type.
+   * @param {Number} retriesLeft Number of times to retry async request before giving up. -1 = retry infinite times.
+   * @returns 
+   */
+  async retryUntilSucceeded(asyncRequest, args = [], retriesLeft = 3) {
+    if (retriesLeft === 0) {
+      return;
+    }
+
     let result;
     try {
       result = await asyncRequest(...args);
-      console.log('retry succeeded', asyncRequest);
     } catch(error) {
-      console.log('error retry', error);
-      result = await this.retryUntilSucceeded(asyncRequest, args);
+      result = await this.retryUntilSucceeded(asyncRequest, args, retriesLeft - 1);
     }
     return result;
   }
