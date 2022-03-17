@@ -9,6 +9,9 @@ import Header from './Header';
 import Content from './Content';
 import {saveLikedFormSubmission, onMessage, fetchLikedFormSubmissions} from './service/mockServer';
 
+/**
+ * Main stateful class component that manages behavior of the presentational components.
+ */
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -19,6 +22,9 @@ class App extends React.Component {
     }
   }
   
+  /**
+   * Snackbar action buttons including liking form submission and closing snackbar.
+   */
   likeSubmissionAction = (
     <React.Fragment>
       <Button onClick={() => {
@@ -121,12 +127,19 @@ class App extends React.Component {
     return result;
   }
 
+  /**
+   * Clear snackbar timeout. This is useful for cases where snackbar is called repeatedly and
+   * previous snackbar is removed but its 5 second timer is still running.
+   */
   tearDownSnackbarTimer() {
     if (this.snackbarTimerId) {
       clearTimeout(this.snackbarTimerId);
     };
   }
 
+  /**
+   * Simple closing of snackbar.
+   */
   closeSnackbar() {
     if (this.state.bShowSnackbar) {
       this.setState({bShowSnackbar: false});
