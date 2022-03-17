@@ -69,7 +69,6 @@ class App extends React.Component {
    * @param {Object} form A form object that matches the submitted form objects.
    */
   onFormSubmitted(form) {
-    console.log('onFormSubmitted', form);
     this.setState({ lastSubmittedForm: form });
     this.openSnackbarFor5Seconds();
   }
@@ -84,19 +83,17 @@ class App extends React.Component {
   }
 
   async likeFormSubmission()  {
-    console.log('liked form');
     const { lastSubmittedForm } = this.state;
     const likedForm = {...lastSubmittedForm, data: { ...lastSubmittedForm.data, liked: true }};
 
     this.addLikedFormLocally(likedForm);
 
     try {
-      const result = await saveLikedFormSubmission(likedForm);
-      console.log('saved', 'result: ', result);
+      await saveLikedFormSubmission(likedForm);
 
+      this.persistLikedForms();      
       this.hydrateLikedForms();
     } catch(error) {
-      console.log('likeFormSubmission error', error);
       this.retryUntilSucceeded(saveLikedFormSubmission, [likedForm]);
     }
 
