@@ -51,7 +51,8 @@ test("Edge case: onLike is not a required prop. If you don't pass onLike callbac
 test('If you pass onClose callback, onClose should be called when the close button is clicked.', () => {
     const mockedOnClose = jest.fn();
     render(<Toast open={true} onClose={mockedOnClose}/>);
-    fireEvent.click(screen.queryByRole('button', {name: /close/i}));
+    const button = screen.queryByRole('button', {name: /close/i});
+    fireEvent.click(button);
     expect(mockedOnClose).toBeCalledTimes(1);
 })
 
