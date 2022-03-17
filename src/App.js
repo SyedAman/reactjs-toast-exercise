@@ -1,12 +1,10 @@
 import React from 'react';
 import Container from '@mui/material/Container';
-import Snackbar from '@mui/material/Snackbar';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 
 import Header from './Header';
 import Content from './Content';
+import Toast from './Toast';
+
 import {saveLikedFormSubmission, onMessage, fetchLikedFormSubmissions} from './service/mockServer';
 
 /**
@@ -21,27 +19,6 @@ class App extends React.Component {
       lastSubmittedForm: null
     }
   }
-  
-  /**
-   * Snackbar action buttons including liking form submission and closing snackbar.
-   */
-  likeSubmissionAction = (
-    <React.Fragment>
-      <Button onClick={() => {
-        this.likeFormSubmission();
-      }}>
-        Like
-      </Button>
-        <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={(event, reason) => this.handleCloseSnackbar(event, reason)}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </React.Fragment>
-  )
 
   async componentDidMount() {
     await this.hydrateLikedForms();
@@ -88,7 +65,11 @@ class App extends React.Component {
     this.setState({ likedFormSubmissions: [...this.state.likedFormSubmissions, likedForm] });
   }
 
-  async likeFormSubmission()  {
+  /**
+   * Save form server side. Simulate liking by closing snackbar. Also add liked form locally
+   * and then wait for fetching the liked forms from server.
+   */
+  likeFormSubmission = async () =>  {
     const { lastSubmittedForm } = this.state;
     const likedForm = {...lastSubmittedForm, data: { ...lastSubmittedForm.data, liked: true }};
 
@@ -146,19 +127,13 @@ class App extends React.Component {
     }
   }
 
+  /**
+   * Setup a timer for snackbar to open for 5 seconds then close.
+   */
   openSnackbarFor5Seconds() {
     this.tearDownSnackbarTimer();
     this.setState({bShowSnackbar: true});
     this.snackbarTimerId = setTimeout(() => this.closeSnackbar(), 5000);
-  }
-
-  formSnackbarMessage() {
-    let message = "First Lastname email.address@domain.com";
-    if (this.state.lastSubmittedForm) {
-      const { data: { firstName, lastName, email } } = this.state.lastSubmittedForm;
-      message = `${firstName} ${lastName} ${email}`;
-    }
-    return message;
   }
 
   /**
@@ -176,6 +151,12 @@ class App extends React.Component {
     return JSON.parse(localStorage.getItem('likedFormSubmissions')) || []
   }
 
+  /**
+   * Close the snackbar via button click.
+   * @param {ClickEvent} event Node event representing button click.
+   * @param {String} reason How the snackbar was closed. 
+   * @returns 
+   */
   handleCloseSnackbar(event, reason) {
     if (reason == 'clickaway') {
       return;
@@ -185,14 +166,13 @@ class App extends React.Component {
   }
 
   render() {
-    const snackbarMessage = this.formSnackbarMessage();
     return (
       <>
         <Header />
         <Container>
           <Content props={this.state.likedFormSubmissions}/>
         </Container>
-        <Snackbar open={this.state.bShowSnackbar} message={snackbarMessage} action={this.likeSubmissionAction} />
+        <Toast open={this.state.bShowSnackbar} lastSubmittedForm={this.state.lastSubmittedForm} onClose={this.handleCloseSnackbar} onLike={this.likeFormSubmission} />
       </>
     );
   }

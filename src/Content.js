@@ -10,12 +10,21 @@ function LikedFormSubmissionListItem({props: likedForm}) {
   );
 }
 
+/**
+ * 
+ * @param {SubmittedForm[]} likedForms An array of liked submitted form objects.
+ * @returns Array of React nodes.
+ */
+function generateListOfLikedFormSubmissions(likedForms) {
+  return likedForms.map(likedForm => <LikedFormSubmissionListItem key={likedForm.id} props={likedForm} />)
+}
+
 export default function Content({props}) {
   return (
     <Box sx={{marginTop: 3}}>
       <Typography variant="h4">Liked Form Submissions</Typography>
 
-      {props.filter(x => x.data.liked).map(likedForm => <LikedFormSubmissionListItem key={likedForm.id} props={likedForm} />)}
+      {generateListOfLikedFormSubmissions(props)}
     </Box>
   );
 }
