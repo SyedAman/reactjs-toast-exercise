@@ -103,7 +103,7 @@ class App extends React.Component {
 
   tearDownSnackbarTimer() {
     if (this.snackbarTimerId) {
-      this.snackbarTimerId.clearTimeout();
+      clearTimeout(this.snackbarTimerId);
     };
   }
 
@@ -116,7 +116,7 @@ class App extends React.Component {
   openSnackbarFor5Seconds() {
     this.tearDownSnackbarTimer();
     this.setState({bShowSnackbar: true});
-    setTimeout(() => this.closeSnackbar(), 5000);
+    this.snackbarTimerId = setTimeout(() => this.closeSnackbar(), 5000);
   }
 
   formSnackbarMessage() {
