@@ -17,7 +17,6 @@ function formSnackbarMessage(submittedForm) {
     return message;
 }
 
-
 function Toast({ open, lastSubmittedForm, onClose, onLike }) {
     /**
      * Snackbar action buttons including liking form submission and closing snackbar.

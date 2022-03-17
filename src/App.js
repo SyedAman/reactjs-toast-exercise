@@ -158,7 +158,7 @@ class App extends React.Component {
    * @returns 
    */
   handleCloseSnackbar(event, reason) {
-    if (reason == 'clickaway') {
+    if (reason === 'clickaway') {
       return;
     }
 
@@ -170,7 +170,7 @@ class App extends React.Component {
       <>
         <Header />
         <Container>
-          <Content props={this.state.likedFormSubmissions}/>
+          <Content likedForms={this.state.likedFormSubmissions}/>
         </Container>
         <Toast open={this.state.bShowSnackbar} lastSubmittedForm={this.state.lastSubmittedForm} onClose={this.handleCloseSnackbar} onLike={this.likeFormSubmission} />
       </>
