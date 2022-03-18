@@ -1,6 +1,7 @@
 {
   "name": "toast-exercise",
   "version": "1.0.1",
+  "homepage": "https://SyedAman.github.io/react-toast-exercise",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.5.0",
@@ -20,7 +21,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
