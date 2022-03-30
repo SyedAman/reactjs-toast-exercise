@@ -157,7 +157,7 @@ class App extends React.Component {
    * @param {String} reason How the snackbar was closed. 
    * @returns 
    */
-  handleCloseSnackbar(event, reason) {
+  handleCloseSnackbar = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
